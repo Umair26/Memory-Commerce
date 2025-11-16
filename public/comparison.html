@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini Memory Comparison</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 1200px; 
+      margin: 50px auto; 
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .main-container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    h1 { 
+      text-align: center; 
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .input-section {
+      margin-bottom: 30px;
+    }
+    .container { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 20px; 
+    }
+    .panel { 
+      border: 2px solid #ddd; 
+      padding: 20px; 
+      border-radius: 10px;
+      background: #fafafa;
+    }
+    .with-memory { border-color: #4CAF50; background: #f1f8f4; }
+    .without-memory { border-color: #f44336; background: #fff5f5; }
+    h2 { margin-top: 0; color: #333; }
+    .features { 
+      list-style: none; 
+      padding: 0; 
+      margin: 15px 0;
+    }
+    .features li { 
+      padding: 5px 0; 
+      font-size: 14px;
+    }
+    .features li:before { content: "✅ "; }
+    .no-features li:before { content: "❌ "; }
+    input { 
+      width: 100%; 
+      padding: 15px; 
+      margin: 10px 0; 
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button { 
+      width: 100%;
+      padding: 15px 20px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+    button:hover { 
+      transform: scale(1.02);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .response { 
+      background: white;
+      padding: 15px; 
+      border-radius: 8px; 
+      margin: 15px 0;
+      min-height: 100px;
+      border: 1px solid #e0e0e0;
+    }
+    .stats { 
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      padding: 20px; 
+      border-radius: 10px; 
+      margin: 20px 0;
+      text-align: center;
+    }
+    .loading { 
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .loading.active { display: block; }
+    .error {
+      background: #ffebee;
+      color: #c62828;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: none;
+    }
+    .error.active { display: block; }
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+      body { margin: 20px auto; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <h1>🧠 Gemini Memory System vs Standard Gemini</h1>
+    
+    <div class="input-section">
+      <input type="text" id="message" placeholder="Try: 'My name is John' then 'What's my name?'">
+      <button onclick="compare()" id="compareBtn">Compare Both Systems</button>
+    </div>
+    
+    <div class="loading" id="loading">
+      <p>⏳ Processing your request...</p>
+    </div>
+    
+    <div class="error" id="error"></div>
+    
+    <div class="stats" id="stats" style="display: none;">
+      <strong>📊 Performance Stats:</strong><br>
+      <span id="statsContent"></span>
+    </div>
+    
+    <div class="container">
+      <div class="panel with-memory">
+        <h2>🚀 Your Gemini Memory System</h2>
+        <ul class="features">
+          <li>Unlimited Memory</li>
+          <li>Context Awareness</li>
+          <li>75% Cost Savings</li>
+          <li>Smart Model Routing</li>
+        </ul>
+        <div class="response" id="with-memory-response">
+          <em>Response will appear here...</em>
+        </div>
+      </div>
+      
+      <div class="panel without-memory">
+        <h2>🤖 Standard Gemini (No Memory)</h2>
+        <ul class="features no-features">
+          <li>No Memory</li>
+          <li>No Context</li>
+          <li>No Optimization</li>
+          <li>Single Model</li>
+        </ul>
+        <div class="response" id="without-memory-response">
+          <em>Response will appear here...</em>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function compare() {
+      const message = document.getElementById('message').value.trim();
+      const compareBtn = document.getElementById('compareBtn');
+      const loading = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
+      
+      if (!message) {
+        showError('Please enter a message');
+        return;
+      }
+      
+      // Show loading, disable button
+      loading.classList.add('active');
+      compareBtn.disabled = true;
+      errorDiv.classList.remove('active');
+      
+      console.log('🔍 Sending request to /api/compare...');
+      console.log('📍 Current URL:', window.location.href);
+      
+      try {
+        const response = await fetch('/api/compare', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        
+        console.log('📥 Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`Server error (${response.status}): ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ Response data:', data);
+        
+        // Update with memory response
+        document.getElementById('with-memory-response').innerHTML = `
+          <strong>Model:</strong> ${data.comparison.withMemory.model}<br>
+          <strong>Has Context:</strong> ${data.comparison.withMemory.hasContext ? '✅ Yes' : '❌ No'}<br>
+          <strong>Tokens Used:</strong> ${data.comparison.withMemory.tokensUsed || 'N/A'}<br><br>
+          <strong>Response:</strong><br>${data.comparison.withMemory.response}
+        `;
+        
+        // Update without memory response
+        document.getElementById('without-memory-response').innerHTML = `
+          <strong>Model:</strong> ${data.comparison.withoutMemory.model}<br>
+          <strong>Has Context:</strong> ❌ No<br><br>
+          <strong>Response:</strong><br>${data.comparison.withoutMemory.response}
+        `;
+        
+        // Update stats
+        document.getElementById('stats').style.display = 'block';
+        document.getElementById('statsContent').innerHTML = `
+          Total Queries: ${data.stats.totalQueries} | 
+          Cache Hit Rate: ${data.stats.cacheHitRate} | 
+          Monthly Cost: ${data.stats.monthlyCost}
+        `;
+        
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+        console.error('Comparison error:', error);
+      } finally {
+        loading.classList.remove('active');
+        compareBtn.disabled = false;
+      }
+    }
+    
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('active');
+    }
+    
+    // Allow Enter key to submit
+    document.getElementById('message').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        compare();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+[
+  {
+    "input": "Hello, my name is Malik.",
+    "output": "Hello Malik! It's good to meet you. I'll remember your name. How can I help you today?"
+  },
+  {
+    "input": "Hello, who are you?",
+    "output": "Hello Malik! I am a large language model, trained by Google."
+  }
+]

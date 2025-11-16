@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini Memory System - Investor Benchmark</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 1.2em;
+      margin-bottom: 40px;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .metric-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 3em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .metric-label {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    button {
+      width: 100%;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.3em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+    button:hover { transform: scale(1.02); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .results {
+      display: none;
+    }
+    .results.active { display: block; }
+    .test-case {
+      background: #f8f9fa;
+      padding: 25px;
+      margin: 20px 0;
+      border-radius: 15px;
+      border-left: 5px solid #667eea;
+    }
+    .test-header {
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .system-response {
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .with-memory {
+      background: #d4edda;
+      border: 2px solid #28a745;
+    }
+    .without-memory {
+      background: #f8d7da;
+      border: 2px solid #dc3545;
+    }
+    .winner-badge {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .badge-win {
+      background: #28a745;
+      color: white;
+    }
+    .badge-tie {
+      background: #ffc107;
+      color: #333;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.5em;
+      display: none;
+    }
+    .loading.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Gemini Memory System</h1>
+    <div class="subtitle">AI with Unlimited Persistent Memory - Investor Benchmark Demo</div>
+    
+    <div class="metrics" id="metrics" style="display: none;">
+      <div class="metric-card">
+        <div class="metric-label">Tests Run</div>
+        <div class="metric-value" id="totalTests">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Your System Wins</div>
+        <div class="metric-value" id="wins">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Cache Hit Rate</div>
+        <div class="metric-value" id="cacheRate">0%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Monthly Cost</div>
+        <div class="metric-value" id="monthlyCost">$0</div>
+      </div>
+    </div>
+    
+    <button onclick="runBenchmark()" id="runBtn">🔬 Run Full Benchmark</button>
+    
+    <div class="loading" id="loading">
+      ⏳ Running benchmark tests... This may take 30-60 seconds...
+    </div>
+    
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    async function runBenchmark() {
+      const runBtn = document.getElementById('runBtn');
+      const loading = document.getElementById('loading');
+      const results = document.getElementById('results');
+      const metrics = document.getElementById('metrics');
+      
+      runBtn.disabled = true;
+      loading.classList.add('active');
+      results.innerHTML = '';
+      results.classList.remove('active');
+      
+      try {
+        const response = await fetch('/api/benchmark', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        // Update metrics
+        document.getElementById('totalTests').textContent = data.summary.totalTests;
+        document.getElementById('wins').textContent = data.summary.yourSystemWins;
+        document.getElementById('cacheRate').textContent = data.summary.stats.cacheHitRate;
+        document.getElementById('monthlyCost').textContent = data.summary.stats.estimatedMonthlyCost;
+        metrics.style.display = 'grid';
+        
+        // Display results
+        let html = '';
+        data.results.forEach((test, index) => {
+          const badgeClass = test.winner === "Your System" ? "badge-win" : "badge-tie";
+          html += `
+            <div class="test-case">
+              <div class="test-header">
+                Test ${index + 1}: "${test.query}"
+                <span class="winner-badge ${badgeClass}">${test.winner}</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="system-response with-memory">
+                  <strong>🚀 Your System (With Memory)</strong><br>
+                  <small>Context: ${test.withMemory.hasContext ? '✅ Yes' : '❌ No'}</small><br><br>
+                  ${test.withMemory.response}
+                </div>
+                <div class="system-response without-memory">
+                  <strong>🤖 Standard Gemini (No Memory)</strong><br>
+                  <small>Context: ❌ No</small><br><br>
+                  ${test.withoutMemory.response}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        results.innerHTML = html;
+        results.classList.add('active');
+        
+      } catch (error) {
+        alert('Error: ' + error.message);
+      } finally {
+        loading.classList.remove('active');
+        runBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
