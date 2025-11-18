@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sheets Integration - E-Commerce Platform</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/common.js" defer></script>
+  <style>
+    .sheets-hero {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .connect-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 40px;
+      background: white;
+      border: 2px solid #34a853;
+      color: #34a853;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: var(--font-size-lg);
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+
+    .connect-btn:hover {
+      background: #34a853;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .connect-btn.connected {
+      background: #34a853;
+      color: white;
+      border-color: #34a853;
+    }
+
+    .sheets-list {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .sheet-item {
+      padding: var(--spacing-lg);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .sheet-item:hover {
+      border-color: var(--primary-color);
+      background: var(--bg-light);
+    }
+
+    .sheet-item.selected {
+      border-color: var(--primary-color);
+      background: var(--bg-light);
+    }
+
+    .sheet-info {
+      flex: 1;
+    }
+
+    .sheet-name {
+      font-weight: 600;
+      font-size: var(--font-size-lg);
+      margin-bottom: 4px;
+    }
+
+    .sheet-meta {
+      color: var(--text-muted);
+      font-size: var(--font-size-sm);
+    }
+
+    .enhancement-options {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .option-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .checkbox-label:hover {
+      border-color: var(--primary-color);
+      background: var(--bg-light);
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .processing-status {
+      background: var(--bg-light);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-top: var(--spacing-lg);
+      display: none;
+    }
+
+    .processing-status.active {
+      display: block;
+    }
+
+    .status-item {
+      padding: var(--spacing-sm) 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span>🚀</span>
+        <span>AI E-Commerce Platform</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/upload.html">Upload</a>
+        <a href="/generator.html">Generator</a>
+        <a href="/sheets.html" class="active">Sheets</a>
+        <a href="/analytics.html">Analytics</a>
+        <a href="/chat.html">Chat</a>
+      </nav>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>📊 Google Sheets Integration</h1>
+    <p class="card-subtitle">Connect your Google Sheets and enhance products directly in real-time</p>
+
+    <!-- Connection Status -->
+    <div class="sheets-hero">
+      <div style="font-size: 5em; margin-bottom: 20px;">📊</div>
+      <h2 style="margin-bottom: 20px;">Connect Your Google Account</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 30px;">
+        Securely connect to access and enhance your product spreadsheets
+      </p>
+      <button class="connect-btn" id="connectBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span id="connectText">Connect with Google</span>
+      </button>
+      <p style="color: var(--text-muted); margin-top: 20px; font-size: var(--font-size-sm);">
+        🔒 Your data is secure. We only access sheets you explicitly grant permission to.
+      </p>
+    </div>
+
+    <!-- Sheets List (hidden until connected) -->
+    <div class="sheets-list" id="sheetsList" style="display: none;">
+      <h2 style="margin-bottom: var(--spacing-lg);">📑 Your Spreadsheets</h2>
+      <div id="sheetsContainer">
+        <!-- Sheets will be loaded here -->
+      </div>
+    </div>
+
+    <!-- Enhancement Options -->
+    <div class="enhancement-options" id="enhancementOptions" style="display: none;">
+      <h2 style="margin-bottom: var(--spacing-lg);">⚙️ Enhancement Settings</h2>
+      
+      <div class="option-group">
+        <h3 style="margin-bottom: var(--spacing-md);">What to Enhance:</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" value="title" checked>
+          <div>
+            <strong>Product Titles</strong>
+            <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
+              Optimize titles for SEO and clarity
+            </div>
+          </div>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="description" checked>
+          <div>
+            <strong>Descriptions</strong>
+            <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
+              Create compelling, detailed descriptions
+            </div>
+          </div>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="keywords" checked>
+          <div>
+            <strong>SEO Keywords</strong>
+            <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
+              Generate relevant search keywords
+            </div>
+          </div>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="features">
+          <div>
+            <strong>Feature Lists</strong>
+            <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
+              Extract and format key features
+            </div>
+          </div>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="price">
+          <div>
+            <strong>Price Analysis</strong>
+            <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
+              Suggest optimal pricing
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <button class="btn btn-primary btn-lg" id="startEnhancementBtn" style="width: 100%;">
+        ✨ Start AI Enhancement
+      </button>
+
+      <!-- Processing Status -->
+      <div class="processing-status" id="processingStatus">
+        <h3 style="margin-bottom: var(--spacing-md);">Processing...</h3>
+        <div id="statusContainer">
+          <!-- Status items will appear here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2025 AI E-Commerce Platform. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:support@example.com">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let isConnected = false;
+    let selectedSheet = null;
+    let mockSheets = [];
+
+    // Connect button
+    document.getElementById('connectBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('connectBtn');
+      const text = document.getElementById('connectText');
+      
+      // Simulate OAuth flow
+      text.textContent = 'Connecting...';
+      btn.disabled = true;
+
+      // In production, this would open Google OAuth
+      setTimeout(() => {
+        isConnected = true;
+        btn.classList.add('connected');
+        text.textContent = '✓ Connected';
+        loadSheets();
+      }, 1500);
+    });
+
+    // Load sheets
+    function loadSheets() {
+      // Mock sheets data
+      mockSheets = [
+        { id: '1', name: 'Product Inventory 2025', rows: 245, lastModified: '2 hours ago' },
+        { id: '2', name: 'Amazon Listings', rows: 156, lastModified: '1 day ago' },
+        { id: '3', name: 'eBay Products', rows: 89, lastModified: '3 days ago' }
+      ];
+
+      const container = document.getElementById('sheetsContainer');
+      container.innerHTML = mockSheets.map(sheet => `
+        <div class="sheet-item" data-id="${sheet.id}">
+          <div class="sheet-info">
+            <div class="sheet-name">📄 ${sheet.name}</div>
+            <div class="sheet-meta">${sheet.rows} rows • Updated ${sheet.lastModified}</div>
+          </div>
+          <button class="btn btn-primary">Select</button>
+        </div>
+      `).join('');
+
+      // Add click handlers
+      document.querySelectorAll('.sheet-item').forEach(item => {
+        item.addEventListener('click', () => selectSheet(item.dataset.id));
+      });
+
+      document.getElementById('sheetsList').style.display = 'block';
+    }
+
+    // Select sheet
+    function selectSheet(sheetId) {
+      selectedSheet = mockSheets.find(s => s.id === sheetId);
+      
+      // Update UI
+      document.querySelectorAll('.sheet-item').forEach(item => {
+        item.classList.toggle('selected', item.dataset.id === sheetId);
+      });
+
+      // Show enhancement options
+      document.getElementById('enhancementOptions').style.display = 'block';
+      scrollToElement('enhancementOptions');
+    }
+
+    // Start enhancement
+    document.getElementById('startEnhancementBtn').addEventListener('click', async () => {
+      if (!selectedSheet) {
+        showError('Please select a spreadsheet first');
+        return;
+      }
+
+      const selectedOptions = Array.from(
+        document.querySelectorAll('.checkbox-label input:checked')
+      ).map(cb => cb.value);
+
+      if (selectedOptions.length === 0) {
+        showError('Please select at least one enhancement option');
+        return;
+      }
+
+      const btn = document.getElementById('startEnhancementBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Processing...';
+
+      const statusDiv = document.getElementById('processingStatus');
+      const statusContainer = document.getElementById('statusContainer');
+      statusDiv.classList.add('active');
+      statusContainer.innerHTML = '';
+
+      try {
+        // Simulate processing
+        for (let i = 0; i < selectedSheet.rows; i++) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
+          statusContainer.innerHTML = `
+            <div class="status-item">
+              <span>Processing row ${i + 1} of ${selectedSheet.rows}</span>
+              <span class="badge badge-primary">${Math.round((i + 1) / selectedSheet.rows * 100)}%</span>
+            </div>
+          `;
+
+          if (i % 20 === 0) {
+            const option = selectedOptions[Math.floor(Math.random() * selectedOptions.length)];
+            statusContainer.innerHTML += `
+              <div class="status-item">
+                <span>✓ Enhanced ${option} for row ${i + 1}</span>
+                <span class="badge badge-success">Done</span>
+              </div>
+            `;
+          }
+        }
+
+        // Complete
+        showSuccess(`Successfully enhanced ${selectedSheet.rows} products!`);
+        statusContainer.innerHTML += `
+          <div class="status-item" style="background: var(--bg-light); padding: var(--spacing-md); border-radius: var(--radius-sm); margin-top: var(--spacing-md);">
+            <span style="font-weight: 600;">✅ Enhancement Complete!</span>
+            <button class="btn btn-success btn-sm" onclick="window.open('https://docs.google.com/spreadsheets', '_blank')">
+              Open in Google Sheets
+            </button>
+          </div>
+        `;
+
+      } catch (error) {
+        showError('Enhancement failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Start AI Enhancement';
+      }
+    });
+  </script>
+</body>
+</html>

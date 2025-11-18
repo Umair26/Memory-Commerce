@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Product Generator - E-Commerce Platform</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/common.js" defer></script>
+  <style>
+    .generator-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .input-section, .output-section {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .section-title {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      margin-bottom: var(--spacing-lg);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .image-preview {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      margin-top: var(--spacing-md);
+      display: none;
+    }
+
+    .image-preview.active {
+      display: block;
+    }
+
+    .output-card {
+      background: var(--bg-light);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-md);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .output-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-xs);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output-content {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .keyword-tag {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: 20px;
+      margin: 4px;
+      font-size: var(--font-size-sm);
+    }
+
+    .feature-item {
+      padding: var(--spacing-sm);
+      background: white;
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--spacing-xs);
+      display: flex;
+      align-items: start;
+      gap: 10px;
+    }
+
+    .copy-btn {
+      padding: 6px 12px;
+      background: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      transition: var(--transition-fast);
+    }
+
+    .copy-btn:hover {
+      background: var(--secondary-dark);
+    }
+
+    .platform-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .platform-tab {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: var(--gray-200);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition-fast);
+    }
+
+    .platform-tab.active {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .generator-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span>🚀</span>
+        <span>AI E-Commerce Platform</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/upload.html">Upload</a>
+        <a href="/generator.html" class="active">Generator</a>
+        <a href="/sheets.html">Sheets</a>
+        <a href="/analytics.html">Analytics</a>
+        <a href="/chat.html">Chat</a>
+      </nav>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>✨ AI Product Generator</h1>
+    <p class="card-subtitle">Generate complete product listings from competitor URLs or product images</p>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Generated Today</div>
+        <div class="stat-value" id="generatedToday">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg. Quality Score</div>
+        <div class="stat-value">9.2/10</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Time Saved</div>
+        <div class="stat-value" id="timeSaved">0h</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cost Per Listing</div>
+        <div class="stat-value">$0.02</div>
+      </div>
+    </div>
+
+    <!-- Generator -->
+    <div class="generator-container">
+      <!-- Input Section -->
+      <div class="input-section">
+        <h2 class="section-title">📝 Input Details</h2>
+
+        <div class="form-group">
+          <label class="form-label">Competitor Product URL (Optional)</label>
+          <input type="url" id="competitorUrl" class="form-input" placeholder="https://amazon.com/product-example">
+          <small style="color: var(--text-muted);">We'll analyze and improve their listing</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Product Title *</label>
+          <input type="text" id="productTitle" class="form-input" placeholder="Enter product name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Product Category</label>
+          <select id="productCategory" class="form-select">
+            <option value="">Select category...</option>
+            <option value="electronics">Electronics</option>
+            <option value="clothing">Clothing & Fashion</option>
+            <option value="home">Home & Kitchen</option>
+            <option value="beauty">Beauty & Personal Care</option>
+            <option value="sports">Sports & Outdoors</option>
+            <option value="toys">Toys & Games</option>
+            <option value="books">Books</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Product Image (Optional)</label>
+          <input type="file" id="productImage" class="form-input" accept="image/*">
+          <img id="imagePreview" class="image-preview" alt="Preview">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Key Features (Optional)</label>
+          <textarea id="keyFeatures" class="form-textarea" placeholder="Enter key features, one per line..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Price Range</label>
+          <input type="text" id="priceRange" class="form-input" placeholder="e.g., $29.99 - $39.99">
+        </div>
+
+        <button class="btn btn-primary btn-lg" id="generateBtn" style="width: 100%;">
+          ✨ Generate Product Listing
+        </button>
+      </div>
+
+      <!-- Output Section -->
+      <div class="output-section">
+        <h2 class="section-title">🎯 Generated Listing</h2>
+
+        <!-- Platform Tabs -->
+        <div class="platform-tabs">
+          <button class="platform-tab active" data-platform="general">General</button>
+          <button class="platform-tab" data-platform="amazon">Amazon</button>
+          <button class="platform-tab" data-platform="ebay">eBay</button>
+          <button class="platform-tab" data-platform="shopify">Shopify</button>
+        </div>
+
+        <div id="outputContainer">
+          <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <div style="font-size: 4em; margin-bottom: 20px;">🤖</div>
+            <p>Enter product details and click "Generate" to see AI-powered results</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2025 AI E-Commerce Platform. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:support@example.com">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let currentPlatform = 'general';
+    let generatedData = null;
+
+    // Image preview
+    document.getElementById('productImage').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const preview = document.getElementById('imagePreview');
+        const dataUrl = await readFileAsDataURL(file);
+        preview.src = dataUrl;
+        preview.classList.add('active');
+      }
+    });
+
+    // Platform tabs
+    document.querySelectorAll('.platform-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentPlatform = tab.dataset.platform;
+        if (generatedData) {
+          displayResults(generatedData, currentPlatform);
+        }
+      });
+    });
+
+    // Generate button
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      const title = document.getElementById('productTitle').value.trim();
+      
+      if (!title) {
+        showError('Please enter a product title');
+        return;
+      }
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Generating...';
+
+      try {
+        const formData = {
+          competitorUrl: document.getElementById('competitorUrl').value,
+          title: title,
+          category: document.getElementById('productCategory').value,
+          features: document.getElementById('keyFeatures').value,
+          priceRange: document.getElementById('priceRange').value
+        };
+
+        // Add image if present
+        const imageFile = document.getElementById('productImage').files[0];
+        if (imageFile) {
+          formData.image = await readFileAsDataURL(imageFile);
+        }
+
+        const response = await fetch('/api/generate-listing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) throw new Error('Generation failed');
+
+        const data = await response.json();
+        generatedData = data;
+        displayResults(data, currentPlatform);
+
+        // Update stats
+        const current = parseInt(document.getElementById('generatedToday').textContent);
+        document.getElementById('generatedToday').textContent = current + 1;
+        document.getElementById('timeSaved').textContent = Math.round((current + 1) * 0.5) + 'h';
+
+      } catch (error) {
+        console.error('Generation error:', error);
+        showError('Failed to generate listing: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Generate Product Listing';
+      }
+    });
+
+    // Display results
+    function displayResults(data, platform = 'general') {
+      const container = document.getElementById('outputContainer');
+      const listing = data[platform] || data.general;
+
+      container.innerHTML = `
+        <!-- Title -->
+        <div class="output-card">
+          <div class="output-label">
+            📝 Optimized Title
+            <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(listing.title)}')">Copy</button>
+          </div>
+          <div class="output-content"><strong>${listing.title}</strong></div>
+        </div>
+
+        <!-- Description -->
+        <div class="output-card">
+          <div class="output-label">
+            📄 Description
+            <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(listing.description)}')">Copy</button>
+          </div>
+          <div class="output-content">${listing.description}</div>
+        </div>
+
+        <!-- Features -->
+        <div class="output-card">
+          <div class="output-label">✅ Key Features</div>
+          <div class="output-content">
+            ${listing.features.map(f => `
+              <div class="feature-item">
+                <span>•</span>
+                <span>${f}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Keywords -->
+        <div class="output-card">
+          <div class="output-label">🔍 SEO Keywords</div>
+          <div class="output-content">
+            ${listing.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- Price Suggestion -->
+        <div class="output-card">
+          <div class="output-label">💰 Suggested Price</div>
+          <div class="output-content">
+            <strong style="font-size: 1.5em; color: var(--secondary-color);">${listing.suggestedPrice}</strong>
+            <p style="margin-top: 8px; font-size: 0.9em;">${listing.priceRationale}</p>
+          </div>
+        </div>
+
+        <!-- Download Options -->
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button class="btn btn-success" onclick="downloadListing('txt')">
+            📥 Download as TXT
+          </button>
+          <button class="btn btn-success" onclick="downloadListing('json')">
+            📥 Download as JSON
+          </button>
+        </div>
+      `;
+    }
+
+    // Download listing
+    function downloadListing(format) {
+      if (!generatedData) return;
+
+      const listing = generatedData[currentPlatform] || generatedData.general;
+      let content, filename, type;
+
+      if (format === 'txt') {
+        content = `
+PRODUCT LISTING - ${listing.title}
+
+TITLE:
+${listing.title}
+
+DESCRIPTION:
+${listing.description}
+
+KEY FEATURES:
+${listing.features.map((f, i) => `${i + 1}. ${f}`).join('\n')}
+
+SEO KEYWORDS:
+${listing.keywords.join(', ')}
+
+SUGGESTED PRICE:
+${listing.suggestedPrice}
+
+PRICE RATIONALE:
+${listing.priceRationale}
+        `.trim();
+        filename = 'product-listing.txt';
+        type = 'text/plain';
+      } else {
+        content = JSON.stringify(listing, null, 2);
+        filename = 'product-listing.json';
+        type = 'application/json';
+      }
+
+      downloadFile(content, filename, type);
+    }
+
+    // Escape HTML for copy function
+    function escapeHtml(text) {
+      return text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    }
+
+    // Load stats on page load
+    updateStatsDisplay();
+  </script>
+</body>
+</html>

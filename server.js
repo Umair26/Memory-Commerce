@@ -8,6 +8,16 @@ import { costTrackerPlugin } from "./plugins/cost_tracker.js";
 import { multimodalPlugin } from "./plugins/multimodal.js";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import fs from "fs";
+import multer from 'multer';
+import { listingEnhancerPlugin } from './plugins/listing_enhancer.js';
+import { CSVParser } from './utils/csv_parser.js';
+import { productGeneratorPlugin } from './plugins/product_generator.js';
+
+
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +44,7 @@ if (fs.existsSync("./game_world.json")) {
 }
 
 // Initialize
-plugins.registerPlugin("cost-tracker", costTrackerPlugin);
+
 await engine.initialize(worldData);
 
 // Health check
@@ -267,6 +277,48 @@ app.post("/api/benchmark", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Upload and enhance listings
+app.post("/api/upload-listings", upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    console.log('📤 Processing file:', req.file.originalname);
+    
+    // Determine file type
+    const fileType = req.file.originalname.split('.').pop().toLowerCase();
+    
+    // Parse file
+    const products = await CSVParser.parseFile(req.file.buffer, fileType);
+    
+    if (!products || products.length === 0) {
+      return res.status(400).json({ error: 'No products found in file' });
+    }
+
+    console.log(`📊 Found ${products.length} products`);
+    
+    // Enhance listings
+    const enhanced = await listingEnhancerPlugin.enhanceBatch(products);
+    
+    // Calculate stats
+    const stats = {
+      processed: enhanced.length,
+      improvements: enhanced.reduce((sum, item) => sum + item.improvements.length, 0),
+      timeSaved: Math.round(enhanced.length * 0.5) // Estimate 30 min per product manually
+    };
+    
+    res.json({
+      success: true,
+      enhanced,
+      stats
+    });
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Stats endpoint
 app.get("/api/stats", (req, res) => {
@@ -277,7 +329,32 @@ app.get("/api/stats", (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+app.post("/api/generate-listing", async (req, res) => {
+  try {
+    const { title, category, features, priceRange, competitorUrl, image } = req.body;
+    
+    if (!title) {
+      return res.status(400).json({ error: 'Product title is required' });
+    }
 
+    console.log('🎨 Generating listing for:', title);
+    
+    const listings = await productGeneratorPlugin.generateListing({
+      title,
+      category,
+      features,
+      priceRange,
+      competitorUrl,
+      image
+    });
+    
+    res.json(listings);
+    
+  } catch (error) {
+    console.error('Generation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 // STATIC FILES LAST (serves index.html at root)
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -299,9 +376,11 @@ Endpoints:
 
 Pages:
   /                   - Home (with menu)
+  /upload.html        - Upload & enhance listings
   /chat.html          - Chat interface
   /comparison.html    - Live comparison
   /benchmark.html     - Automated benchmark
   /dashboard.html     - Admin dashboard
+  /upload.html        - Upload & enhance listings
 `);
 });

@@ -1,220 +1,317 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Gemini Memory Comparison</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Comparison - AI E-Commerce Platform</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/common.js" defer></script>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      max-width: 1200px; 
-      margin: 50px auto; 
-      padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .main-container {
+    .comparison-hero {
       background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+      margin-bottom: var(--spacing-xl);
     }
-    .back-button {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #6c757d;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-weight: bold;
-      transition: background 0.3s;
+
+    .comparison-hero h1 {
+      font-size: 3em;
+      margin-bottom: var(--spacing-md);
     }
-    .back-button:hover {
-      background: #5a6268;
+
+    .comparison-hero p {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xl);
     }
-    h1 { 
-      text-align: center; 
-      color: #333;
-      margin-bottom: 30px;
-    }
+
     .input-section {
-      margin-bottom: 30px;
+      background: white;
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--spacing-xl);
     }
-    .container { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 20px; 
-    }
-    .panel { 
-      border: 2px solid #ddd; 
-      padding: 20px; 
-      border-radius: 10px;
-      background: #fafafa;
-    }
-    .with-memory { border-color: #4CAF50; background: #f1f8f4; }
-    .without-memory { border-color: #f44336; background: #fff5f5; }
-    h2 { margin-top: 0; color: #333; }
-    .features { 
-      list-style: none; 
-      padding: 0; 
-      margin: 15px 0;
-    }
-    .features li { 
-      padding: 5px 0; 
-      font-size: 14px;
-    }
-    .features li:before { content: "✅ "; }
-    .no-features li:before { content: "❌ "; }
-    input { 
-      width: 100%; 
-      padding: 15px; 
-      margin: 10px 0; 
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button { 
+
+    .input-section input {
       width: 100%;
-      padding: 15px 20px; 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white; 
-      border: none; 
-      border-radius: 8px; 
+      padding: var(--spacing-lg);
+      border: 2px solid var(--gray-300);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-lg);
+      font-family: var(--font-family);
+      margin-bottom: var(--spacing-md);
+      transition: border-color var(--transition-fast);
+    }
+
+    .input-section input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-section button {
+      width: 100%;
+      padding: var(--spacing-lg) var(--spacing-2xl);
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-xl);
+      font-weight: 700;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: transform 0.2s;
+      transition: all var(--transition-normal);
     }
-    button:hover { 
+
+    .input-section button:hover:not(:disabled) {
       transform: scale(1.02);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
     }
-    button:disabled {
+
+    .input-section button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
-    .response { 
+
+    .loading-container {
+      display: none;
+      text-align: center;
+      padding: var(--spacing-xl);
       background: white;
-      padding: 15px; 
-      border-radius: 8px; 
-      margin: 15px 0;
-      min-height: 100px;
-      border: 1px solid #e0e0e0;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--spacing-xl);
     }
-    .stats { 
-      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-      padding: 20px; 
-      border-radius: 10px; 
-      margin: 20px 0;
-      text-align: center;
+
+    .loading-container.active {
+      display: block;
     }
-    .loading { 
+
+    .loading-container .spinner {
+      margin: 0 auto var(--spacing-md);
+    }
+
+    .loading-text {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+    }
+
+    .error-container {
       display: none;
-      text-align: center;
-      margin: 20px 0;
+      padding: var(--spacing-lg);
+      background: #fee;
+      border: 2px solid #ef4444;
+      border-radius: var(--radius-md);
+      color: #c33;
+      margin-bottom: var(--spacing-xl);
     }
-    .loading.active { display: block; }
-    .error {
-      background: #ffebee;
-      color: #c62828;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 20px 0;
+
+    .error-container.active {
+      display: block;
+    }
+
+    .stats-banner {
       display: none;
-    }
-    .error.active { display: block; }
-    
-    /* Donation Footer */
-    .donation-footer {
-      margin-top: 50px;
-      padding: 40px 30px;
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border-radius: 15px;
-      text-align: center;
-      border: 2px solid #dee2e6;
-    }
-    .donation-header {
-      font-size: 1.8em;
-      color: #333;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
-    .donation-text {
-      color: #666;
-      font-size: 1.1em;
-      margin-bottom: 25px;
-      line-height: 1.6;
-    }
-    .donation-highlight {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--gradient-primary);
       color: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      font-size: 1.2em;
-      font-weight: bold;
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+      font-size: var(--font-size-lg);
     }
-    .donation-buttons {
+
+    .stats-banner.active {
+      display: block;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .panel {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      transition: transform var(--transition-normal);
+    }
+
+    .panel:hover {
+      transform: translateY(-5px);
+    }
+
+    .with-memory {
+      border-left: 5px solid var(--secondary-color);
+    }
+
+    .without-memory {
+      border-left: 5px solid #ef4444;
+    }
+
+    .panel h2 {
+      font-size: var(--font-size-2xl);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-md);
+      background: var(--bg-light);
+      border-radius: var(--radius-md);
+    }
+
+    .features li {
+      padding: var(--spacing-sm) 0;
       display: flex;
-      gap: 15px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .donation-btn {
-      padding: 15px 35px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.1em;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: inline-flex;
       align-items: center;
       gap: 10px;
+      font-weight: 600;
     }
-    .donation-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+
+    .features li::before {
+      content: '✅';
+      font-size: 1.2em;
     }
-    .btn-coffee {
-      background: #FFDD00;
-      color: #000;
+
+    .no-features li::before {
+      content: '❌';
     }
-    .btn-github {
-      background: #333;
-      color: white;
+
+    .response {
+      background: var(--bg-light);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      min-height: 150px;
+      line-height: 1.8;
+      color: var(--text-primary);
     }
-    
+
+    .response em {
+      color: var(--text-muted);
+    }
+
+    .response strong {
+      display: inline-block;
+      margin-top: var(--spacing-sm);
+      color: var(--text-primary);
+    }
+
+    .donation-footer {
+      margin-top: var(--spacing-2xl);
+      padding: var(--spacing-2xl);
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      border: 2px solid var(--gray-300);
+    }
+
+    .donation-header {
+      font-size: var(--font-size-2xl);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-md);
+      font-weight: 700;
+    }
+
+    .donation-text {
+      color: var(--text-secondary);
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-xl);
+      line-height: 1.6;
+    }
+
+    .donation-buttons {
+      display: flex;
+      justify-content: center;
+    }
+
     @media (max-width: 768px) {
-      .container { grid-template-columns: 1fr; }
-      body { margin: 20px auto; padding: 10px; }
-      .donation-buttons { flex-direction: column; }
-      .donation-btn { width: 100%; justify-content: center; }
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-hero h1 {
+        font-size: 2em;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="main-container">
-    <a href="index.html" class="back-button">← Back to Home</a>
-    
-    <h1>🧠 MemoryAI System vs Standard Gemini</h1>
-    
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span>🚀</span>
+        <span>AI E-Commerce Platform</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/upload.html">Upload</a>
+        <a href="/generator.html">Generator</a>
+        <a href="/sheets.html">Sheets</a>
+        <a href="/analytics.html">Analytics</a>
+        <a href="/chat.html">Chat</a>
+      </nav>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="comparison-hero">
+      <h1>⚡ Live System Comparison</h1>
+      <p>See the power of persistent memory vs standard AI in real-time</p>
+      <div style="display: inline-flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+        <span class="badge badge-success">✅ Context Aware</span>
+        <span class="badge badge-success">✅ 75% Cost Savings</span>
+        <span class="badge badge-success">✅ Smart Routing</span>
+      </div>
+    </div>
+
+    <!-- Input Section -->
     <div class="input-section">
-      <input type="text" id="message" placeholder="Try: 'My name is John' then 'What's my name?'">
-      <button onclick="compare()" id="compareBtn">Compare Both Systems</button>
+      <label class="form-label" style="margin-bottom: var(--spacing-md);">
+        Try asking: "My name is John" then "What's my name?"
+      </label>
+      <input 
+        type="text" 
+        id="message" 
+        placeholder="Enter your message here..."
+        onkeypress="if(event.key==='Enter') compare()"
+      >
+      <button onclick="compare()" id="compareBtn">
+        🔬 Compare Both Systems
+      </button>
     </div>
-    
-    <div class="loading" id="loading">
-      <p>⏳ Processing your request...</p>
+
+    <!-- Loading -->
+    <div class="loading-container" id="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">⏳ Processing your request...</div>
     </div>
-    
-    <div class="error" id="error"></div>
-    
-    <div class="stats" id="stats" style="display: none;">
-      <strong>📊 Performance Stats:</strong><br>
+
+    <!-- Error -->
+    <div class="error-container" id="error"></div>
+
+    <!-- Stats Banner -->
+    <div class="stats-banner" id="stats">
+      <strong>📊 Performance Stats:</strong>
       <span id="statsContent"></span>
     </div>
-    
-    <div class="container">
+
+    <!-- Comparison Grid -->
+    <div class="comparison-grid">
       <div class="panel with-memory">
         <h2>🚀 Your MemoryAI System</h2>
         <ul class="features">
@@ -227,7 +324,7 @@
           <em>Response will appear here...</em>
         </div>
       </div>
-      
+
       <div class="panel without-memory">
         <h2>🤖 Standard Gemini (No Memory)</h2>
         <ul class="features no-features">
@@ -241,18 +338,42 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Donation Footer -->
     <div class="donation-footer">
-      <div class="donation-header">☕ Support MemoryAI Development</div>
+      <div class="donation-header">☕ Support Our Development</div>
       <div class="donation-text">
         This project saves you <strong>75% on AI costs</strong>. If you find it valuable, consider supporting our work!<br>
-        Your support helps us maintain and improve MemoryAI for everyone.
+        Your support helps us maintain and improve the platform for everyone.
       </div>
       <div class="donation-buttons">
-        <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="Jeremiahgesters" data-color="#667eea" data-emoji="🙏" data-font="Inter" data-text="Donate Please" data-outline-color="#764ba2" data-font-color="#ffffff" data-coffee-color="#FFDD00"></script>
+        <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" 
+          data-name="bmc-button" 
+          data-slug="Jeremiahgesters" 
+          data-color="#667eea" 
+          data-emoji="🙏" 
+          data-font="Inter" 
+          data-text="Donate Please" 
+          data-outline-color="#764ba2" 
+          data-font-color="#ffffff" 
+          data-coffee-color="#FFDD00">
+        </script>
       </div>
     </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2025 AI E-Commerce Platform. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:support@example.com">Support</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     async function compare() {
@@ -262,13 +383,19 @@
       const errorDiv = document.getElementById('error');
       
       if (!message) {
-        showError('Please enter a message');
+        errorDiv.textContent = '❌ Please enter a message';
+        errorDiv.classList.add('active');
         return;
       }
       
       loading.classList.add('active');
       compareBtn.disabled = true;
+      compareBtn.textContent = '⏳ Comparing...';
       errorDiv.classList.remove('active');
+      
+      // Reset responses
+      document.getElementById('with-memory-response').innerHTML = '<em>Processing...</em>';
+      document.getElementById('without-memory-response').innerHTML = '<em>Processing...</em>';
       
       try {
         const response = await fetch('/api/compare', {
@@ -284,46 +411,62 @@
         
         const data = await response.json();
         
+        // Display with-memory response
         document.getElementById('with-memory-response').innerHTML = `
           <strong>Model:</strong> ${data.comparison.withMemory.model}<br>
           <strong>Has Context:</strong> ${data.comparison.withMemory.hasContext ? '✅ Yes' : '❌ No'}<br>
-          <strong>Tokens Used:</strong> ${data.comparison.withMemory.tokensUsed || 'N/A'}<br><br>
-          <strong>Response:</strong><br>${data.comparison.withMemory.response}
+          <strong>Tokens Used:</strong> ${data.comparison.withMemory.tokensUsed || 'N/A'}<br>
+          <strong>Features:</strong> ${data.comparison.withMemory.features.join(', ')}<br><br>
+          <strong>Response:</strong><br>
+          <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 8px;">
+            ${escapeHtml(data.comparison.withMemory.response)}
+          </div>
         `;
         
+        // Display without-memory response
         document.getElementById('without-memory-response').innerHTML = `
           <strong>Model:</strong> ${data.comparison.withoutMemory.model}<br>
-          <strong>Has Context:</strong> ❌ No<br><br>
-          <strong>Response:</strong><br>${data.comparison.withoutMemory.response}
+          <strong>Has Context:</strong> ❌ No<br>
+          <strong>Features:</strong> ${data.comparison.withoutMemory.features.join(', ')}<br><br>
+          <strong>Response:</strong><br>
+          <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 8px;">
+            ${escapeHtml(data.comparison.withoutMemory.response)}
+          </div>
         `;
         
-        document.getElementById('stats').style.display = 'block';
+        // Display stats
+        document.getElementById('stats').classList.add('active');
         document.getElementById('statsContent').innerHTML = `
-          Total Queries: ${data.stats.totalQueries} | 
-          Cache Hit Rate: ${data.stats.cacheHitRate} | 
-          Monthly Cost: ${data.stats.monthlyCost}
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          Total Queries: <strong>${data.stats.totalQueries}</strong>
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          Cache Hit Rate: <strong>${data.stats.cacheHitRate}</strong>
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          Monthly Cost: <strong>${data.stats.monthlyCost}</strong>
         `;
+        
+        // Scroll to results
+        document.querySelector('.comparison-grid').scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
         
       } catch (error) {
-        showError(`Error: ${error.message}`);
+        errorDiv.textContent = `❌ Error: ${error.message}`;
+        errorDiv.classList.add('active');
         console.error('Comparison error:', error);
       } finally {
         loading.classList.remove('active');
         compareBtn.disabled = false;
+        compareBtn.textContent = '🔬 Compare Both Systems';
       }
     }
     
-    function showError(message) {
-      const errorDiv = document.getElementById('error');
-      errorDiv.textContent = message;
-      errorDiv.classList.add('active');
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
-    
-    document.getElementById('message').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        compare();
-      }
-    });
   </script>
 </body>
 </html>

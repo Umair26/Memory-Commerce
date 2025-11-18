@@ -3,6 +3,7 @@ import { memory, vectorStore } from "./gemini_memory_system.js";
 import { memoryOrch } from "./memory_orchestrator.js";
 import { cacheManager } from "./gemini_caching.js";
 import { plugins } from "./plugins/plugin_system.js";
+import { costTrackerPlugin } from "./plugins/cost_tracker.js";
 
 class ConversationEngine {
   constructor() {
@@ -12,7 +13,7 @@ class ConversationEngine {
 
   async initialize(worldData) {
     await memoryOrch.initialize();
-    
+    plugins.registerPlugin("cost-tracker", costTrackerPlugin);
     // Create world cache if data provided (optional)
     if (worldData && Object.keys(worldData).length > 0) {
       try {

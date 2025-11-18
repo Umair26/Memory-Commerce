@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - E-Commerce Platform</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/common.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-container {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .chart-title {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--spacing-lg);
+      color: var(--text-primary);
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .insight-card {
+      background: white;
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .insight-icon {
+      font-size: 2.5em;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .insight-value {
+      font-size: var(--font-size-3xl);
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: var(--spacing-sm) 0;
+    }
+
+    .insight-label {
+      color: var(--text-secondary);
+      font-size: var(--font-size-base);
+    }
+
+    .insight-change {
+      margin-top: var(--spacing-sm);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+    }
+
+    .insight-change.positive {
+      color: var(--secondary-color);
+    }
+
+    .insight-change.negative {
+      color: #ef4444;
+    }
+
+    .top-products {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .product-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .product-row:last-child {
+      border-bottom: none;
+    }
+
+    .product-rank {
+      font-size: var(--font-size-xl);
+      font-weight: bold;
+      color: var(--gray-400);
+      margin-right: var(--spacing-md);
+      min-width: 40px;
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .product-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .product-category {
+      font-size: var(--font-size-sm);
+      color: var(--text-muted);
+    }
+
+    .product-stats {
+      text-align: right;
+    }
+
+    .product-value {
+      font-size: var(--font-size-lg);
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .date-range-selector {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .date-btn {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: var(--gray-200);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition-fast);
+    }
+
+    .date-btn.active {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .insights-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span>🚀</span>
+        <span>AI E-Commerce Platform</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/upload.html">Upload</a>
+        <a href="/generator.html">Generator</a>
+        <a href="/sheets.html">Sheets</a>
+        <a href="/analytics.html" class="active">Analytics</a>
+        <a href="/chat.html">Chat</a>
+      </nav>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>📈 Analytics Dashboard</h1>
+    <p class="card-subtitle">Track performance, trends, and insights for your product listings</p>
+
+    <!-- Date Range Selector -->
+    <div class="date-range-selector">
+      <button class="date-btn" data-range="7">Last 7 Days</button>
+      <button class="date-btn active" data-range="30">Last 30 Days</button>
+      <button class="date-btn" data-range="90">Last 90 Days</button>
+      <button class="date-btn" data-range="365">Last Year</button>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" id="totalRevenue">$24,567</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Products Listed</div>
+        <div class="stat-value" id="productsListed">1,234</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg. Conversion Rate</div>
+        <div class="stat-value" id="conversionRate">3.4%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">AI Cost Savings</div>
+        <div class="stat-value">75%</div>
+      </div>
+    </div>
+
+    <!-- Insights -->
+    <div class="insights-grid">
+      <div class="insight-card">
+        <div class="insight-icon">📊</div>
+        <div class="insight-value">+23%</div>
+        <div class="insight-label">Sales Growth</div>
+        <div class="insight-change positive">↑ vs. last month</div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-value">4.2/5</div>
+        <div class="insight-label">Avg. Quality Score</div>
+        <div class="insight-change positive">↑ 0.3 improvement</div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">⚡</div>
+        <div class="insight-value">127</div>
+        <div class="insight-label">Listings Enhanced</div>
+        <div class="insight-change positive">↑ This week</div>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="chart-container">
+      <h2 class="chart-title">💰 Revenue Trend</h2>
+      <canvas id="revenueChart"></canvas>
+    </div>
+
+    <!-- Performance Chart -->
+    <div class="chart-container">
+      <h2 class="chart-title">📊 Listing Performance</h2>
+      <canvas id="performanceChart"></canvas>
+    </div>
+
+    <!-- Keyword Ranking Chart -->
+    <div class="chart-container">
+      <h2 class="chart-title">🔍 Top Keywords</h2>
+      <canvas id="keywordChart"></canvas>
+    </div>
+
+    <!-- Top Products -->
+    <div class="top-products">
+      <h2 class="chart-title">🏆 Top Performing Products</h2>
+      
+      <div class="product-row">
+        <div class="product-rank">#1</div>
+        <div class="product-info">
+          <div class="product-name">Premium Wireless Headphones</div>
+          <div class="product-category">Electronics</div>
+        </div>
+        <div class="product-stats">
+          <div class="product-value">$4,567</div>
+          <div class="product-category">156 sales</div>
+        </div>
+      </div>
+
+      <div class="product-row">
+        <div class="product-rank">#2</div>
+        <div class="product-info">
+          <div class="product-name">Smart Watch Pro Series</div>
+          <div class="product-category">Electronics</div>
+        </div>
+        <div class="product-stats">
+          <div class="product-value">$3,892</div>
+          <div class="product-category">127 sales</div>
+        </div>
+      </div>
+
+      <div class="product-row">
+        <div class="product-rank">#3</div>
+        <div class="product-info">
+          <div class="product-name">Ergonomic Office Chair</div>
+          <div class="product-category">Furniture</div>
+        </div>
+        <div class="product-stats">
+          <div class="product-value">$3,245</div>
+          <div class="product-category">98 sales</div>
+        </div>
+      </div>
+
+      <div class="product-row">
+        <div class="product-rank">#4</div>
+        <div class="product-info">
+          <div class="product-name">LED Desk Lamp</div>
+          <div class="product-category">Home & Office</div>
+        </div>
+        <div class="product-stats">
+          <div class="product-value">$2,891</div>
+          <div class="product-category">234 sales</div>
+        </div>
+      </div>
+
+      <div class="product-row">
+        <div class="product-rank">#5</div>
+        <div class="product-info">
+          <div class="product-name">Mechanical Keyboard RGB</div>
+          <div class="product-category">Electronics</div>
+        </div>
+        <div class="product-stats">
+          <div class="product-value">$2,654</div>
+          <div class="product-category">112 sales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2025 AI E-Commerce Platform. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:support@example.com">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+      type: 'line',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [{
+          label: 'Revenue ($)',
+          data: [4200, 5600, 6800, 8900],
+          borderColor: '#667eea',
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Views', 'Clicks', 'Add to Cart', 'Purchases'],
+        datasets: [{
+          label: 'Performance Metrics',
+          data: [12450, 8920, 4560, 1234],
+          backgroundColor: [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(118, 75, 162, 0.8)',
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(251, 191, 36, 0.8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Keyword Chart
+    const keywordCtx = document.getElementById('keywordChart').getContext('2d');
+    new Chart(keywordCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Wireless', 'Premium', 'Smart', 'Ergonomic', 'LED'],
+        datasets: [{
+          data: [30, 25, 20, 15, 10],
+          backgroundColor: [
+            '#667eea',
+            '#764ba2',
+            '#10b981',
+            '#fbbf24',
+            '#ef4444'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // Date range selector
+    document.querySelectorAll('.date-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update charts with new data (mock)
+        const range = btn.dataset.range;
+        console.log('Loading data for range:', range, 'days');
+      });
+    });
+
+    // Load real stats
+    updateStatsDisplay();
+  </script>
+</body>
+</html>

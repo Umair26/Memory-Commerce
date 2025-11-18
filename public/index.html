@@ -3,251 +3,226 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gemini Memory System - Home</title>
+  <title>AI E-Commerce Platform - Dashboard</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/common.js" defer></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .header {
-      text-align: center;
-      color: white;
-      padding: 60px 20px;
-    }
-    .header h1 {
-      font-size: 3.5em;
-      margin-bottom: 20px;
-      text-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
-    .header p {
-      font-size: 1.5em;
-      opacity: 0.95;
-    }
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-      margin: 40px 0;
-    }
-    .menu-card {
+    /* Page-specific styles only */
+    .hero {
       background: white;
-      padding: 40px 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border-radius: var(--radius-xl);
+      padding: 60px;
       text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: var(--shadow-xl);
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-size: 3.5em;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    .hero > p {
+      font-size: 1.4em;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
       cursor: pointer;
       text-decoration: none;
       color: inherit;
       display: block;
     }
-    .menu-card:hover {
+
+    .feature-card:hover {
       transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      box-shadow: var(--shadow-xl);
     }
-    .menu-card .icon {
-      font-size: 4em;
+
+    .feature-icon {
+      font-size: 3em;
       margin-bottom: 20px;
     }
-    .menu-card h2 {
-      color: #333;
-      margin-bottom: 15px;
+
+    .feature-card h3 {
       font-size: 1.8em;
+      margin-bottom: 15px;
+      color: var(--text-primary);
     }
-    .menu-card p {
-      color: #666;
+
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 1.1em;
       line-height: 1.6;
-      font-size: 1.05em;
+      margin-bottom: 20px;
     }
-    .stats-bar {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      padding: 25px;
-      border-radius: 15px;
-      display: flex;
-      justify-content: space-around;
-      margin-top: 40px;
+
+    .feature-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      background: var(--gradient-primary);
       color: white;
-    }
-    .stat {
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 2.5em;
-      font-weight: bold;
-      display: block;
-    }
-    .stat-label {
-      font-size: 0.9em;
-      opacity: 0.9;
-      margin-top: 5px;
-    }
-    .features {
-      background: white;
-      padding: 50px 30px;
       border-radius: 20px;
-      margin-top: 40px;
+      font-size: 0.9em;
+      font-weight: 600;
     }
-    .features h2 {
-      text-align: center;
-      color: #333;
-      font-size: 2.5em;
-      margin-bottom: 40px;
-    }
-    .feature-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-    }
-    .feature {
-      display: flex;
-      align-items: start;
-      gap: 15px;
-    }
-    .feature-icon {
-      font-size: 2em;
-      min-width: 50px;
-    }
-    .feature-text h3 {
-      color: #333;
-      margin-bottom: 8px;
-    }
-    .feature-text p {
-      color: #666;
-      line-height: 1.5;
-    }
+
     @media (max-width: 768px) {
-      .header h1 { font-size: 2.5em; }
-      .header p { font-size: 1.2em; }
-      .menu-grid { grid-template-columns: 1fr; }
-      .stats-bar {
-        flex-direction: column;
-        gap: 20px;
+      .hero h1 {
+        font-size: 2em;
+      }
+      
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .features {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span>🚀</span>
+        <span>AI E-Commerce Platform</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="active">Dashboard</a>
+        <a href="/upload.html">Upload</a>
+        <a href="/generator.html">Generator</a>
+        <a href="/sheets.html">Sheets</a>
+        <a href="/analytics.html">Analytics</a>
+        <a href="/chat.html">Chat</a>
+      </nav>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
   <div class="container">
-    <div class="header">
-      <h1>🧠 Gemini Memory System</h1>
-      <p>AI with Unlimited Persistent Memory & 75% Cost Savings</p>
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1>AI-Powered E-Commerce Listings</h1>
+      <p>Transform your product listings with AI • Save 75% on costs • Boost conversions by 300%</p>
+      
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-label">Products Processed</div>
+          <div class="stat-value" id="totalProducts">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cost Savings</div>
+          <div class="stat-value">75%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cache Hit Rate</div>
+          <div class="stat-value" id="cacheRate">0%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Monthly Cost</div>
+          <div class="stat-value" id="monthlyCost">$0</div>
+        </div>
+      </div>
     </div>
 
-    <div class="stats-bar" id="stats">
-      <div class="stat">
-        <span class="stat-value" id="totalQueries">0</span>
-        <span class="stat-label">Total Queries</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value" id="cacheRate">0%</span>
-        <span class="stat-label">Cache Hit Rate</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value" id="monthlyCost">$0.00</span>
-        <span class="stat-label">Est. Monthly Cost</span>
-      </div>
-    </div>
-
-    <div class="menu-grid">
-      <a href="/chat.html" class="menu-card">
-        <div class="icon">💬</div>
-        <h2>Chat Interface</h2>
-        <p>Interactive chat with persistent memory. Your AI remembers everything across sessions.</p>
-      </a>
-
-      <a href="/comparison.html" class="menu-card">
-        <div class="icon">⚖️</div>
-        <h2>Live Comparison</h2>
-        <p>See side-by-side comparison of our memory system vs standard Gemini in real-time.</p>
-      </a>
-
-      <a href="/benchmark.html" class="menu-card">
-        <div class="icon">🔬</div>
-        <h2>Automated Benchmark</h2>
-        <p>Run comprehensive tests proving our system's superiority with data-driven results.</p>
-      </a>
-
-      <a href="/dashboard.html" class="menu-card">
-        <div class="icon">📊</div>
-        <h2>Admin Dashboard</h2>
-        <p>Monitor usage, costs, and analytics. Track performance metrics in real-time.</p>
-      </a>
-    </div>
-
+    <!-- Features Grid -->
     <div class="features">
-      <h2>Why Choose Gemini Memory?</h2>
-      <div class="feature-list">
-        <div class="feature">
-          <div class="feature-icon">🧠</div>
-          <div class="feature-text">
-            <h3>Unlimited Memory</h3>
-            <p>Never lose context. Your AI remembers conversations across all sessions permanently.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">💰</div>
-          <div class="feature-text">
-            <h3>75% Cost Savings</h3>
-            <p>Intelligent caching and optimization reduce API costs dramatically.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🚀</div>
-          <div class="feature-text">
-            <h3>Smart Routing</h3>
-            <p>Automatically routes queries to the optimal model for best quality and cost.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🔍</div>
-          <div class="feature-text">
-            <h3>Context Awareness</h3>
-            <p>Retrieves relevant information from 3-tier memory system (hot/warm/cold).</p>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📷</div>
-          <div class="feature-text">
-            <h3>Multimodal Support</h3>
-            <p>Process images, audio, and video alongside text conversations.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🔧</div>
-          <div class="feature-text">
-            <h3>Plugin System</h3>
-            <p>Extensible architecture with tools, calculators, and custom functions.</p>
-          </div>
-        </div>
-      </div>
+      <a href="/upload.html" class="feature-card">
+        <div class="feature-icon">📤</div>
+        <h3>Upload & Enhance</h3>
+        <p>Upload CSV/Excel files with your product listings. Our AI automatically enhances titles, descriptions, and SEO keywords.</p>
+        <span class="feature-badge">Most Popular</span>
+      </a>
+
+      <a href="/generator.html" class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>AI Product Generator</h3>
+        <p>Generate complete product listings from scratch. Input competitor URLs or product images to create optimized listings instantly.</p>
+        <span class="feature-badge">New</span>
+      </a>
+
+      <a href="/sheets.html" class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Google Sheets Integration</h3>
+        <p>Connect your Google Sheets directly. Edit and enhance products in real-time with seamless synchronization.</p>
+        <span class="feature-badge">Coming Soon</span>
+      </a>
+
+      <a href="/analytics.html" class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Performance Analytics</h3>
+        <p>Track listing performance, keyword rankings, and revenue predictions. Make data-driven decisions to boost sales.</p>
+        <span class="feature-badge">Pro Feature</span>
+      </a>
+
+      <a href="/chat.html" class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>AI Assistant</h3>
+        <p>Chat with our AI to get instant help with your listings. Ask questions, get suggestions, and optimize on the fly.</p>
+        <span class="feature-badge">Live</span>
+      </a>
+
+      <a href="/benchmark.html" class="feature-card">
+        <div class="feature-icon">🔬</div>
+        <h3>System Benchmark</h3>
+        <p>See how our memory-powered AI outperforms standard systems. View live comparisons and cost savings analysis.</p>
+        <span class="feature-badge">Investor Demo</span>
+      </a>
     </div>
   </div>
 
-  <script>
-    async function updateStats() {
-      try {
-        const response = await fetch('/api/stats');
-        const stats = await response.json();
-        
-        document.getElementById('totalQueries').textContent = stats.totalQueries || 0;
-        document.getElementById('cacheRate').textContent = stats.cacheHitRate || '0%';
-        document.getElementById('monthlyCost').textContent = stats.estimatedMonthlyCost || '$0.00';
-      } catch (error) {
-        console.error('Failed to load stats:', error);
-      }
-    }
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div>
+        <p class="footer-text">© 2025 AI E-Commerce Platform. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:support@example.com">Support</a>
+      </div>
+    </div>
+  </footer>
 
-    // Update stats on load and every 10 seconds
-    updateStats();
-    setInterval(updateStats, 10000);
+  <script>
+    // Stats are automatically loaded by common.js
+    // But we can also manually trigger if needed
+    document.addEventListener('DOMContentLoaded', () => {
+      updateStatsDisplay();
+    });
   </script>
 </body>
 </html>
